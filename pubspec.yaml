@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  deep_pick: ^1.1.0
+  http: ^1.5.0
+  youtube_explode_dart: ^2.5.2
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +21,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - data/
