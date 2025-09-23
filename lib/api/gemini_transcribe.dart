@@ -108,3 +108,44 @@ List<Word> parseWordsTranscription(String responseBody) =>
     extractGeminiResponse(
       responseBody,
     ).split('\n').where((line) => line.isNotEmpty).map(wordFromString).toList();
+
+Future<String> fetchWordsTranscriptionWithUploadedFile(
+  String fileUri,
+  String apiKey,
+) async {
+  const String url =
+      //'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent';
+
+  final Map<String, String> headers = {
+    'x-goog-api-key': apiKey,
+    'Content-Type': 'application/json',
+  };
+
+  final body = {
+    "contents": [
+      {
+        "parts": [
+          {"text": wordsTranscriptPrompt},
+          {
+            "file_data": {"mime_type": "video/mp4", "file_uri": fileUri},
+          },
+        ],
+      },
+    ],
+  };
+
+  final res = await http.post(
+    Uri.parse(url),
+    headers: headers,
+    body: jsonEncode(body),
+  );
+
+  if (res.statusCode == 200) {
+    return res.body;
+  } else {
+    throw Exception(
+      'Failed to fetch words transcription. Status Code = ${res.statusCode}, Message = ${res.body}',
+    );
+  }
+}

@@ -1,6 +1,8 @@
 import 'dart:io';
 
-import 'package:create_srt_for_youtube/api/gemini.dart';
+import 'package:create_srt_for_youtube/api/gemini_transcribe.dart';
+import 'package:create_srt_for_youtube/model/sentence_segment.dart';
+import 'package:create_srt_for_youtube/model/srt.dart';
 import 'package:create_srt_for_youtube/model/word.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -72,5 +74,20 @@ void main() {
       expect(result.last.start, 63299);
       expect(result.last.end, 63929);
     });
+  });
+
+  group('some test', () {
+    test('some test', () async {
+      final result = await fetchWordsTranscriptionWithUploadedFile(
+        'https://generativelanguage.googleapis.com/v1beta/files/g1m1yl3o96z4',
+        Platform.environment['GEMINI_API_KEY']!,
+      );
+      final words = parseWordsTranscription(result);
+      final ss = splitBySentence(words);
+      final srt = toSrtRecords(ss);
+      final texts = srtRecordsToStrings(srt);
+      texts.forEach(print);
+      expect(texts, isNotEmpty);
+    }, timeout: Timeout(Duration(minutes: 10)));
   });
 }

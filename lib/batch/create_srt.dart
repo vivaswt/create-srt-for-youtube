@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:create_srt_for_youtube/api/gemini.dart';
+import 'package:create_srt_for_youtube/api/gemini_transcribe.dart';
 import 'package:create_srt_for_youtube/api/youtube.dart';
 import 'package:create_srt_for_youtube/model/sentence_segment.dart';
 import 'package:create_srt_for_youtube/model/srt.dart';
