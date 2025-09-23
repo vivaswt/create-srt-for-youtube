@@ -14,22 +14,39 @@ Future<String> getVideoTitle(String videoUrl) async {
   }
 }
 
-Future<void> downloadVideo(String videoUrl, String fileName) async {
-  final yt = YoutubeExplode();
+Future<File> downloadVideo(
+  String videoUrl, {
+  required String folder,
+  required String baseName,
+}) async {
+  const formatOption = 'bv*[vcodec=avc1]+ba[acodec=mp4a]/b[vcodec=avc1]/best';
 
-  try {
-    final manifest = await yt.videos.streamsClient.getManifest(videoUrl);
-    final streamInfo = manifest.muxed.withHighestBitrate();
-    final stream = yt.videos.streamsClient.get(streamInfo);
-    final fileStream = File(fileName).openWrite();
+  final result = await Process.run('yt-dlp', [
+    '-f',
+    formatOption,
+    '--force-overwrites',
+    '-P',
+    folder,
+    '-o',
+    '$baseName.%(ext)s',
+    videoUrl,
+  ]);
 
-    await stream.pipe(fileStream).whenComplete(() async {
-      await fileStream.flush();
-      await fileStream.close();
-    });
-  } catch (e) {
-    throw Exception('Error downloading video: $e');
-  } finally {
-    yt.close();
+  if (result.exitCode != 0) {
+    throw Exception('Error downloading video: ${result.stderr}');
   }
+
+  final fileName = extractFileNameFromLog(result.stdout);
+  if (fileName == null) {
+    throw Exception('Error donloading video: cannot find file name');
+  }
+
+  return File(fileName);
+}
+
+String? extractFileNameFromLog(String logText) {
+  final result = RegExp(
+    r'Destination: (.+)\n',
+  ).firstMatch(logText)?.groups([1]);
+  return result?.first;
 }

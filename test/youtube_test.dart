@@ -22,13 +22,15 @@ void main() {
 
   group('downloadVideo', () {
     test('should suceed to download video', () async {
-      //const videoUrl = 'https://youtu.be/fn49lmHxmqg?si=ytOXDEbil9gyGTsL';
-      const videoUrl = 'https://youtu.be/ASwJSpA8ISI?si=taFqmj--Rocy9pmR';
+      const videoUrl = 'https://youtu.be/Mk5dFqNsibU?si=DyeFUuBEeBBzwU10';
 
-      final title = await getVideoTitle(videoUrl);
-      final fileName = 'data/' + sanitizeFileName(title) + '.mp4';
-      await downloadVideo(videoUrl, fileName);
-      expect(File(fileName).existsSync(), isTrue);
+      final title = sanitizeFileName(await getVideoTitle(videoUrl));
+      final result = await downloadVideo(
+        videoUrl,
+        baseName: title,
+        folder: 'data/',
+      );
+      expect(result.existsSync(), isTrue);
     });
   });
 }
