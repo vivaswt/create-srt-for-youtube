@@ -5,6 +5,8 @@ import 'package:create_srt_for_youtube/others/io_util.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('getVideoTitle', () {
     // This is an integration test that makes a real network call to YouTube.
     test('should return the correct video title for a valid URL', () async {

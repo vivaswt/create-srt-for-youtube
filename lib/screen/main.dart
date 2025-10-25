@@ -14,10 +14,26 @@ class _MainAppState extends State<MainApp> {
   final batch = CreateSrtBatch();
   final TextEditingController _urlController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    batch.addListener(_onBatchUpdate);
+  }
+
+  @override
+  void dispose() {
+    batch.removeListener(_onBatchUpdate);
+    super.dispose();
+  }
+
+  void _onBatchUpdate() {
+    setState(() {});
+  }
+
   void _onTranscribePressed() {
     final url = _urlController.text.trim();
 
-    batch.run(url, Platform.environment['GEMINI_API_KEY']!, 'data/');
+    batch.run(url, 'G:\\マイドライブ\\Movie\\');
   }
 
   @override
@@ -31,6 +47,7 @@ class _MainAppState extends State<MainApp> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  enabled: batch.state != BatchStatus.processing,
                   controller: _urlController,
                   decoration: const InputDecoration(
                     labelText: 'YouTube Video URL',
@@ -39,9 +56,27 @@ class _MainAppState extends State<MainApp> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: _onTranscribePressed,
+                  onPressed: batch.state == BatchStatus.processing
+                      ? null
+                      : _onTranscribePressed,
                   child: const Text('Transcribe'),
                 ),
+                const SizedBox(height: 16),
+                if (batch.state == BatchStatus.processing)
+                  Column(
+                    children: [
+                      const CircularProgressIndicator(),
+                      if (batch.processName != null) ...[
+                        const SizedBox(height: 8),
+                        Text(batch.processName!),
+                      ],
+                    ],
+                  ),
+                if (batch.errorMessage != null)
+                  Text(
+                    batch.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
               ],
             ),
           ),
